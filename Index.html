@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="sw" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selvix Host - Web Hosting & Development</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="https://i.ibb.co/nMj56Qy9/upload-1777243717654-466afdcf-jpg.jpg">
+    
+    <!-- Tailwind CSS (na Config ya Dark Mode) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0f172a',
+                        darkcard: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome kwa Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .sidebar-open { transform: translateX(0); }
+        .sidebar-closed { transform: translateX(-100%); }
+        .logo-img { height: 45px; object-fit: contain; border-radius: 8px; }
+        .hidden-section { display: none; }
+        
+        /* CSS kwa Logos zinazozunguka */
+        .marquee-wrapper { overflow: hidden; white-space: nowrap; width: 100%; position: relative; display: flex; align-items: center; }
+        .marquee-content { display: flex; animation: marquee 20s linear infinite; gap: 3rem; padding-left: 3rem;}
+        @keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+        .marquee-content img { height: 40px; opacity: 0.6; filter: grayscale(100%); transition: all 0.3s; }
+        .marquee-content img:hover { filter: grayscale(0%); opacity: 1; }
+
+        /* Custom Scrollbar kwa Domain Results */
+        .domain-scroll::-webkit-scrollbar { width: 8px; }
+        .domain-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark .domain-scroll::-webkit-scrollbar-thumb { background: #475569; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-darkbg dark:text-gray-200">
+
+    <!-- Header / Navbar -->
+    <header class="bg-blue-900 dark:bg-gray-900 text-white shadow-lg sticky top-0 z-50 transition-colors">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <!-- Menu Button -->
+                <button id="menuBtn" class="text-2xl hover:text-blue-300 focus:outline-none transition">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <!-- Logo -->
+            <div class="flex items-center cursor-pointer" onclick="showSection('home')">
+                <img src="https://i.ibb.co/nMj56Qy9/upload-1777243717654-466afdcf-jpg.jpg" alt="Selvix Host" class="logo-img">
+                <span class="ml-3 font-bold text-xl hidden sm:block">Selvix Host</span>
+            </div>
+            
+            <!-- Actions (Dark Mode + Login) -->
+            <div class="flex items-center gap-4">
+                <button onclick="toggleDarkMode()" class="text-xl p-2 rounded-full hover:bg-white/10 transition" title="Badilisha Muonekano">
+                    <i id="themeIcon" class="fas fa-moon"></i>
+                </button>
+                <button onclick="showSection('register')" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-bold text-sm hidden md:block transition">
+                    Jisajili / Ingia
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Menu -->
+    <div id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-darkcard shadow-2xl sidebar-closed transition-transform duration-300 z-40 pt-20 border-r dark:border-gray-700">
+        <ul class="flex flex-col space-y-2 p-4">
+            <li><a href="#" onclick="showSection('home')" class="block p-3 hover:bg-blue-50 dark:hover:bg-gray-700 rounded text-blue-900 dark:text-gray-100 font-semibold"><i class="fas fa-home w-6"></i> Mwanzo</a></li>
+            <li><a href="#" onclick="showSection('about')" class="block p-3 hover:bg-blue-50 dark:hover:bg-gray-700 rounded text-blue-900 dark:text-gray-100 font-semibold"><i class="fas fa-info-circle w-6"></i> Kuhusu Sisi</a></li>
+            <li><a href="#" onclick="showSection('packages')" class="block p-3 hover:bg-blue-50 dark:hover:bg-gray-700 rounded text-blue-900 dark:text-gray-100 font-semibold"><i class="fas fa-tags w-6"></i> Bei Zetu</a></li>
+            <li><a href="#" onclick="showSection('faq')" class="block p-3 hover:bg-blue-50 dark:hover:bg-gray-700 rounded text-blue-900 dark:text-gray-100 font-semibold"><i class="fas fa-question-circle w-6"></i> Maswali & Sheria</a></li>
+            <li><a href="#" onclick="showSection('register')" class="block p-3 hover:bg-blue-50 dark:hover:bg-gray-700 rounded text-blue-900 dark:text-gray-100 font-semibold"><i class="fas fa-user-plus w-6"></i> Jisajili</a></li>
+            <li><a href="#" onclick="showSection('dashboard')" class="block p-3 hover:bg-blue-50 dark:hover:bg-gray-700 rounded text-blue-900 dark:text-gray-100 font-semibold"><i class="fas fa-user-shield w-6"></i> Akaunti Yangu</a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="container mx-auto px-4 py-8 min-h-screen">
+
+        <!-- 1. HOME SECTION -->
+        <section id="home" class="block animate-fade-in">
+            <div class="text-center py-10 max-w-4xl mx-auto">
+                <h1 class="text-4xl md:text-6xl font-bold text-blue-900 dark:text-blue-400 mb-4 tracking-tight">Kamilisha Ndoto Zako na <br><span class="text-orange-500">Selvix Host</span></h1>
+                <p class="text-lg text-gray-600 dark:text-gray-300 mb-10">Tunatoa huduma za kutengeneza Website na Hosting zenye kasi, usalama na ubora wa kiwango cha kimataifa.</p>
+                
+                <!-- Domain Search Area -->
+                <div class="bg-white dark:bg-darkcard p-6 md:p-8 rounded-2xl shadow-xl border dark:border-gray-700">
+                    <h2 class="text-2xl font-bold mb-4 text-left dark:text-white">Tafuta Jina la Domain Yako</h2>
+                    <div class="flex flex-col md:flex-row gap-3">
+                        <input type="text" id="domainInput" placeholder="Mfano: jinalako" class="w-full p-4 border dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 text-lg font-medium">
+                        <button onclick="searchDomain()" class="bg-orange-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-orange-600 transition shadow-lg w-full md:w-auto flex-shrink-0 text-lg">
+                            <i class="fas fa-search mr-2"></i> Tafuta
+                        </button>
+                    </div>
+                    
+                    <!-- Search Results -->
+                    <div id="domainResultsContainer" class="mt-6 hidden">
+                        <h3 class="text-left font-bold text-gray-700 dark:text-gray-300 mb-3 text-lg">Majina Yanayopatikana:</h3>
+                        <div id="domainResults" class="domain-scroll grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2">
+                            <!-- Matokeo yataingia hapa kupitia JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scrolling Partners/Logos -->
+            <div class="mt-16 pt-10 border-t dark:border-gray-700 text-center">
+                <p class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-6">Tunashirikiana na Teknolojia Kubwa Duniani</p>
+                <div class="marquee-wrapper bg-white dark:bg-gray-800 py-6 rounded-xl shadow-sm border dark:border-gray-700">
+                    <div class="marquee-content">
+                        <!-- Logos zinajirudia kutengeneza infinite loop -->
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" alt="AWS">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Cloudflare_Logo.svg" alt="Cloudflare">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Meta">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Nextjs-logo.svg" alt="NextJS">
+                        <!-- Zinarudia -->
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" alt="AWS">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Cloudflare_Logo.svg" alt="Cloudflare">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Meta">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. ABOUT US SECTION -->
+        <section id="about" class="hidden-section max-w-5xl mx-auto py-10">
+            <h2 class="text-3xl md:text-5xl font-bold text-center text-blue-900 dark:text-blue-400 mb-8">Sisi Ni Nani?</h2>
+            <div class="bg-white dark:bg-darkcard p-8 rounded-2xl shadow-lg text-gray-700 dark:text-gray-300 leading-relaxed space-y-6 text-lg border dark:border-gray-700">
+                <p><strong>Selvix Host</strong> ni kampuni ya kisasa inayoongoza katika kutoa suluhisho la kidijitali kwa biashara, mashirika, na watu binafsi ndani na nje ya Tanzania. Lengo letu ni kuhakikisha kila Mtanzania anapata nafasi ya kumiliki tovuti yenye ubora wa hali ya juu na kasi ya kimataifa.</p>
+                <p>Tunajivunia kuwa na wataalamu wabobezi wa kutengeneza mifumo (Web Development) na kusimamia Server (Web Hosting). Tunatumia teknolojia za kisasa zaidi kama Cloud Hosting, NVMe SSDs, na ulinzi mkali dhidi ya wadukuzi.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                    <div class="bg-blue-50 dark:bg-gray-800 p-6 rounded-xl text-center">
+                        <i class="fas fa-rocket text-4xl text-orange-500 mb-4"></i>
+                        <h4 class="font-bold text-xl mb-2 dark:text-white">Kasi ya Ajabu</h4>
+                        <p class="text-sm">Server zetu zipo optimized kufanya tovuti yako ifunguke kwa haraka sana.</p>
+                    </div>
+                    <div class="bg-blue-50 dark:bg-gray-800 p-6 rounded-xl text-center">
+                        <i class="fas fa-shield-alt text-4xl text-orange-500 mb-4"></i>
+                        <h4 class="font-bold text-xl mb-2 dark:text-white">Usalama wa 100%</h4>
+                        <p class="text-sm">Free SSL na ulinzi thabiti wa kuzuia mashambulizi ya kimtandao.</p>
+                    </div>
+                    <div class="bg-blue-50 dark:bg-gray-800 p-6 rounded-xl text-center">
+                        <i class="fas fa-headset text-4xl text-orange-500 mb-4"></i>
+                        <h4 class="font-bold text-xl mb-2 dark:text-white">Msaada Masaa 24/7</h4>
+                        <p class="text-sm">Timu yetu ipo tayari kukusaidia muda wowote utakapopata changamoto.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. PACKAGES (BEI ZETU) -->
+        <section id="packages" class="hidden-section pt-10">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-5xl font-bold text-blue-900 dark:text-blue-400">Bei na Vifurushi Vyetu</h2>
+                <p class="text-gray-600 dark:text-gray-400 mt-3 text-lg">Chagua kifurushi kinachoendana na mahitaji yako. Malipo ni rahisi na salama.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+                
+                <!-- Package 1: 6,000/= (.store Domain Only) -->
+                <div class="bg-white dark:bg-darkcard rounded-2xl shadow-lg p-8 border dark:border-gray-700 hover:border-orange-500 transition-all flex flex-col">
+                    <h3 class="text-2xl font-bold dark:text-white">Basic (.Store)</h3>
+                    <p class="text-4xl font-bold text-orange-500 my-4">Tsh 6,000<span class="text-base text-gray-500 font-normal">/mwezi</span></p>
+                    <ul class="text-gray-600 dark:text-gray-300 space-y-4 mb-8 flex-1">
+                        <li><i class="fas fa-check-circle text-green-500 mr-2"></i> .store Domain Yako</li>
+                        <li><i class="fas fa-check-circle text-green-500 mr-2"></i> 1GB Storage Space</li>
+                        <li><i class="fas fa-check-circle text-green-500 mr-2"></i> 2 Professional Emails</li>
+                        <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Cpanel Control</li>
+                    </ul>
+                    <a href="https://palmpesa.drmlelwa.co.tz/contribute/B9VUS9RVKF" target="_blank" class="w-full text-center bg-blue-100 dark:bg-gray-800 text-blue-900 dark:text-blue-400 font-bold py-3 rounded-xl hover:bg-blue-200 dark:hover:bg-gray-700 transition">Lipia Sasa</a>
+                </div>
+
+                <!-- Package 2: 10,000/= (Starter Host) -->
+                <div class="bg-white dark:bg-darkcard rounded-2xl shadow-lg p-8 border dark:border-gray-700 hover:border-blue-500 transition-all flex flex-col">
+                    <h3 class="text-2xl font-bold dark:text-white">Starter Host</h3>
+                    <p class="text-4xl font-bold text-blue-600 dark:text-blue-400 my-4">Tsh 10,000<span class="text-base text-gray-500 font-normal">/mwezi</span></p>
+                    <ul class="text-gray-600 dark:text-gray-300 space-y-4 mb-8 flex-1">
+                        <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Hosted Domain Yoyote</li>
+                        <li><i class="fas fa-check-circle text-green-500 mr-2"></i> 5GB NVMe Storage</li>
+                        <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Unlimited Bandwidth</li>
+                        <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Free SSL Certificate</li>
+                    </ul>
+                    <a href="https://palmpesa.drmlelwa.co.tz/contribute/0P8IGTEDBU" target="_blank" class="w-full text-center bg-blue-100 dark:bg-gray-800 text-blue-900 dark:text-blue-400 font-bold py-3 rounded-xl hover:bg-blue-200 dark:hover:bg-gray-700 transition">Lipia Sasa</a>
+                </div>
+
+                <!-- Package 3: OFA YA LAKI 1 -->
+                <div class="bg-blue-900 dark:bg-blue-950 rounded-2xl shadow-2xl p-8 border-2 border-orange-500 transform lg:scale-105 relative flex flex-col text-white">
+                    <div class="absolute -top-4 right-6 bg-orange-500 text-white font-bold px-4 py-1 rounded-full shadow-lg animate-pulse">OFA MAALUM!</div>
+                    <h3 class="text-2xl font-bold text-orange-400">Full Website Design</h3>
+                    <p class="text-4xl font-bold text-white my-4">Tsh 100,000<span class="text-base text-blue-200 font-normal">/mwaka</span></p>
+                    <ul class="space-y-4 mb-8 flex-1 text-gray-200">
+                        <li><i class="fas fa-star text-orange-400 mr-2"></i> Kutengenezewa Tovuti Kamili</li>
+                        <li><i class="fas fa-star text-orange-400 mr-2"></i> Domain Bure (.com / .tz)</li>
+                        <li><i class="fas fa-star text-orange-400 mr-2"></i> Unlimited Storage Hosting</li>
+                        <li><i class="fas fa-star text-orange-400 mr-2"></i> SEO & Google Setup</li>
+                    </ul>
+                    <a href="https://palmpesa.drmlelwa.co.tz/contribute/AS7TT74VSF" target="_blank" class="w-full text-center bg-orange-500 text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition shadow-lg text-lg">Weka Oda Hii</a>
+                </div>
+
+                <!-- Package 4: Business / VPS -->
+                <div class="bg-white dark:bg-darkcard rounded-2xl shadow-lg p-8 border dark:border-gray-700 hover:border-blue-500 transition-all flex flex-col">
+                    <h3 class="text-2xl font-bold dark:text-white">Business / VPS</h3>
+                    <p class="text-4xl font-bold text-blue-600 dark:text-blue-400 my-4">Tsh 50,000+<span class="text-base text-gray-500 font-normal"></span></p>
+                    <ul class="text-gray-600 dark:text-gray-300 space-y-4 mb-8 flex-1">
+                        <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Kuanzia 50k / mwaka</li>
+                        <li><i class="fas fa-check-circle text-green-500 mr-2"></i> High Performance VPS</li>
+                        <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Dedicated IP & Root Access</li>
+                        <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Advanced Security Firewalls</li>
+                    </ul>
+                    <a href="https://palmpesa.drmlelwa.co.tz/contribute/N6KPIMJTP7" target="_blank" class="w-full text-center bg-blue-100 dark:bg-gray-800 text-blue-900 dark:text-blue-400 font-bold py-3 rounded-xl hover:bg-blue-200 dark:hover:bg-gray-700 transition">Lipia Sasa</a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. FAQ & TERMS SECTION -->
+        <section id="faq" class="hidden-section max-w-4xl mx-auto py-10">
+            <h2 class="text-3xl md:text-5xl font-bold text-center text-blue-900 dark:text-blue-400 mb-8">Maswali & Sheria Zetu</h2>
+            
+            <div class="space-y-6">
+                <!-- Maswali -->
+                <div class="bg-white dark:bg-darkcard p-6 rounded-xl shadow-md border dark:border-gray-700">
+                    <h3 class="text-xl font-bold text-orange-500 mb-4 border-b pb-2 dark:border-gray-700"><i class="fas fa-question-circle mr-2"></i> Maswali Yanayoulizwa Sana (FAQ)</h3>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold dark:text-white">1. Inachukua muda gani website yangu kuwa hewani?</h4>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Kwa ununuzi wa Domain na Hosting, inakuwa tayari papo hapo baada ya malipo. Kama ni OFA ya kutengenezewa, inachukua siku 2 mpaka 5 za kazi.</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold dark:text-white">2. Je, ninaweza kuhamisha domain yangu kuja Selvix?</h4>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Ndiyo. Unaweza kuhamisha domain na files zako zote kwetu bure kabisa bila gharama ya ziada.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold dark:text-white">3. Malipo yanaelekezwa wapi?</h4>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Malipo yote yanafanyika kwa usalama kupitia mfumo wa Palmpesa kwenye viungo vyetu (Links) rasmi vilivyopo kwenye tovuti hii.</p>
+                    </div>
+                </div>
+
+                <!-- Sheria na Masharti -->
+                <div class="bg-white dark:bg-darkcard p-6 rounded-xl shadow-md border dark:border-gray-700">
+                    <h3 class="text-xl font-bold text-blue-900 dark:text-blue-400 mb-4 border-b pb-2 dark:border-gray-700"><i class="fas fa-gavel mr-2"></i> Masharti na Sheria (TOS)</h3>
+                    <ul class="list-disc pl-5 text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                        <li>Hairuhusiwi kuhost tovuti zenye maudhui ya uhalifu, wizi, au yanayokiuka sheria za nchi.</li>
+                        <li>Malipo yakishafanyika na domain kusajiliwa, hayawezi kurejeshwa (No refunds on Domains).</li>
+                        <li>Mteja anawajibika kuhifadhi password zake kwa usalama.</li>
+                        <li>Risiti ya malipo (Screenshot) lazima itumwe kwenye Dashibodi baada ya kulipia ili huduma ifunguliwe.</li>
+                        <li>Selvix Host ina haki ya kusitisha huduma endapo mteja atakiuka masharti ya matumizi mabaya ya rasilimali za server (Spamming/Phishing).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. REGISTRATION -->
+        <section id="register" class="hidden-section max-w-lg mx-auto bg-white dark:bg-darkcard p-8 rounded-2xl shadow-2xl mt-10 border dark:border-gray-700 border-t-4 border-t-orange-500">
+            <h2 class="text-3xl font-bold text-center text-blue-900 dark:text-white mb-6">Jisajili / Ingia</h2>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 font-bold mb-2 text-sm">Majina Matatu (Full Name)</label>
+                    <input type="text" required class="w-full p-3 border dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 outline-none">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 font-bold mb-2 text-sm">Barua Pepe (Email)</label>
+                    <input type="email" required class="w-full p-3 border dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 outline-none">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 font-bold mb-2 text-sm">Jina la Mtumiaji (Username)</label>
+                    <input type="text" required class="w-full p-3 border dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 outline-none">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 font-bold mb-2 text-sm">Nenosiri (Password)</label>
+                    <input type="password" required class="w-full p-3 border dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 outline-none">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 dark:text-gray-300 font-bold mb-2 text-sm">Thibitisha Nenosiri</label>
+                    <input type="password" required class="w-full p-3 border dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 outline-none">
+                </div>
+                <button type="submit" class="w-full bg-blue-900 text-white font-bold py-3 rounded-lg hover:bg-blue-800 transition-colors text-lg shadow-lg">
+                    Kamilisha Usajili
+                </button>
+            </form>
+        </section>
+
+        <!-- 6. DASHBOARD -->
+        <section id="dashboard" class="hidden-section">
+            <h2 class="text-3xl font-bold text-blue-900 dark:text-white mb-6">Dashibodi (Client Area)</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Side Panel -->
+                <div class="bg-white dark:bg-darkcard p-6 rounded-xl shadow-md lg:col-span-1 border dark:border-gray-700">
+                    <div class="text-center mb-6">
+                        <div class="w-24 h-24 bg-blue-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl text-blue-900 dark:text-orange-500">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 dark:text-white">Akaunti Yangu</h3>
+                        <p class="text-sm text-green-600 font-semibold">Online</p>
+                    </div>
+
+                    <hr class="my-4 dark:border-gray-600">
+
+                    <!-- Screenshot Upload -->
+                    <h4 class="font-bold text-blue-900 dark:text-blue-400 mb-3"><i class="fas fa-file-invoice-dollar mr-2"></i> Tuma Risiti (Screenshot)</h4>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">Tuma picha ya muamala ukishalipa ili Admin akufungulie huduma.</p>
+                    <input type="file" class="w-full text-sm text-gray-500 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-50 dark:file:bg-gray-700 file:text-orange-600 dark:file:text-orange-400 hover:file:bg-orange-100 mb-3 outline-none">
+                    <button class="w-full bg-orange-500 text-white py-2 rounded-lg font-bold text-sm hover:bg-orange-600 transition">Tuma Kwa Admin</button>
+                    
+                    <hr class="my-4 dark:border-gray-600">
+                    
+                    <button class="w-full border-2 border-blue-900 dark:border-gray-600 text-blue-900 dark:text-gray-300 py-2 rounded-lg font-bold text-sm hover:bg-blue-50 dark:hover:bg-gray-700 transition">Badili Taarifa Zangu</button>
+                </div>
+
+                <!-- Main Panel -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white dark:bg-darkcard p-6 rounded-xl shadow-md mb-6 border dark:border-gray-700">
+                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4"><i class="fas fa-server mr-2 text-orange-500"></i> Huduma & Domain Zangu</h3>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm uppercase">
+                                        <th class="p-4 border-b dark:border-gray-700 rounded-tl-lg">Jina la Domain</th>
+                                        <th class="p-4 border-b dark:border-gray-700">Kifurushi</th>
+                                        <th class="p-4 border-b dark:border-gray-700">Hali</th>
+                                        <th class="p-4 border-b dark:border-gray-700 rounded-tr-lg">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                                        <td class="p-4 border-b dark:border-gray-700 font-semibold text-blue-700 dark:text-blue-400">mfano.store</td>
+                                        <td class="p-4 border-b dark:border-gray-700 text-gray-600 dark:text-gray-300">Basic (.Store)</td>
+                                        <td class="p-4 border-b dark:border-gray-700"><span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-xs font-bold border border-yellow-200">Inasubiri</span></td>
+                                        <td class="p-4 border-b dark:border-gray-700"><button class="text-orange-500 font-bold hover:underline">Manage</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-12 pb-6 mt-10 border-t-4 border-orange-500">
+        <div class="container mx-auto px-4 text-center">
+            <img src="https://i.ibb.co/nMj56Qy9/upload-1777243717654-466afdcf-jpg.jpg" alt="Selvix Host" class="h-16 mx-auto mb-6 rounded-lg shadow-lg">
+            <h3 class="text-3xl font-bold text-orange-500 mb-4">Selvix Host</h3>
+            <p class="text-gray-400 mb-8 max-w-lg mx-auto text-sm leading-relaxed">Tunakupa huduma bora, za uhakika, na zenye ulinzi madhubuti wa Web Development na Hosting za kisasa zaidi, tukiwa na support ya masaa 24.</p>
+            
+            <div class="flex justify-center space-x-6 mb-8">
+                <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-orange-500 hover:text-white transition shadow"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-orange-500 hover:text-white transition shadow"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-orange-500 hover:text-white transition shadow"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-green-500 hover:text-white transition shadow"><i class="fab fa-whatsapp"></i></a>
+            </div>
+            
+            <p class="text-gray-500 text-sm">&copy; 2024 Selvix Host. Haki zote zimehifadhiwa. Iliyoundwa kwa Kisasa.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 1. Dark/Light Mode Logic
+        const htmlElement = document.documentElement;
+        const themeIcon = document.getElementById('themeIcon');
+        
+        function toggleDarkMode() {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            } else {
+                htmlElement.classList.add('dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Angalia setting ya mwanzo (Kama aliwahi kuweka dark mode)
+        if (localStorage.getItem('theme') === 'dark') {
+            htmlElement.classList.add('dark');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+
+        // 2. Sidebar Toggle
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-closed');
+            sidebar.classList.toggle('sidebar-open');
+        });
+
+        // 3. Navigation System (SPA Feel)
+        function showSection(sectionId) {
+            const sections =['home', 'about', 'packages', 'faq', 'register', 'dashboard'];
+            sections.forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+            
+            // Funga sidebar kwa simu
+            sidebar.classList.add('sidebar-closed');
+            sidebar.classList.remove('sidebar-open');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 4. Mfumo Kabambe wa Kutafuta Domain (Na Orodha Yote Uliyotuma)
+        const allExtensions =[
+            ".com", ".net", ".org", ".info", ".biz", ".xyz", ".online", ".site", ".store", 
+            ".tech", ".app", ".dev", ".cloud", ".io", ".ai", ".digital", ".software", 
+            ".systems", ".solutions", ".agency", ".blog", ".news", ".media", ".live", 
+            ".tv", ".video", ".press", ".today", ".world", ".wiki", ".shop", ".market", 
+            ".sale", ".deals", ".finance", ".money", ".capital", ".fund", ".loan", 
+            ".cash", ".security", ".safe", ".protection", ".expert", ".network", 
+            ".support", ".services", ".tools", ".co", ".cc", ".ws", ".name", ".one", 
+            ".fun", ".space", ".club", ".team", ".guru", ".life", ".zone", ".plus", 
+            ".top", ".vip", ".win", ".monster", ".studio", ".design", ".photo", ".music", 
+            ".game", ".games", ".chat", ".email", ".academy", ".school", ".college", 
+            ".university", ".care", ".health", ".doctor", ".law", ".legal", ".tax", 
+            ".travel", ".tour", ".pizza", ".coffee"
+        ];
+
+        function searchDomain() {
+            let input = document.getElementById('domainInput').value.trim().toLowerCase();
+            if(!input) {
+                alert("Tafadhali andika jina la website unalotaka!");
+                return;
+            }
+            
+            // Ondoa spacing au www.
+            input = input.replace(/\s+/g, '').replace('www.', '');
+            // Ondoa extension kama mtu kaandika "jina.com" kisha chukua "jina" pekee
+            if(input.includes('.')) input = input.split('.')[0]; 
+
+            const resultsDiv = document.getElementById('domainResults');
+            resultsDiv.innerHTML = ''; // Safisha matokeo ya zamani
+
+            // Loop kupitia majina yote na kutengeneza HTML
+            allExtensions.forEach(ext => {
+                // Weka .store iwe special case yenye elfu 6, nyingine ziwe random mockup price.
+                let isStore = (ext === '.store');
+                let priceText = isStore ? 'Tsh 6,000 / mwezi' : 'Tsh 35,000 / mwaka';
+                
+                let cardHTML = `
+                    <div class="flex justify-between items-center p-4 border rounded-xl ${isStore ? 'bg-orange-50 border-orange-400 dark:bg-gray-800' : 'bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700'} shadow-sm hover:shadow-md transition">
+                        <div class="truncate mr-3">
+                            <span class="font-bold text-lg dark:text-white truncate">${input}${ext}</span>
+                            <span class="block text-sm font-bold ${isStore ? 'text-orange-600' : 'text-gray-500 dark:text-gray-400'}">${priceText}</span>
+                        </div>
+                        <button onclick="showSection('register')" class="bg-${isStore ? 'orange-500' : 'blue-900'} text-white px-4 py-2 rounded-lg text-sm font-bold shadow hover:opacity-80 flex-shrink-0">
+                            Chagua
+                        </button>
+                    </div>
+                `;
+                
+                // Weka .store juu kabisa
+                if(isStore) {
+                    resultsDiv.insertAdjacentHTML('afterbegin', cardHTML);
+                } else {
+                    resultsDiv.insertAdjacentHTML('beforeend', cardHTML);
+                }
+            });
+
+            document.getElementById('domainResultsContainer').style.display = 'block';
+        }
+
+        // 5. Usajili Fake Process
+        function handleRegister(event) {
+            event.preventDefault();
+            alert("Hongera! Umefanikiwa Kujisajili. Sasa tafadhali chagua kifurushi chako na ufanye malipo.");
+            showSection('packages');
+        }
+    </script>
+</body>
+  </html>
